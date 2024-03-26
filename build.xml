@@ -4,13 +4,35 @@
     <property name="project.version" value="${package(version)}"/>
     <property name="project.app" value="tei-publisher-lib"/>
     <property name="build.dir" value="build"/>
-    <target name="all" depends="xar"/>
+    <property name="app.build.dir" value="${build.dir}/${project.app}-${project.version}" />
+    <target name="all" depends="prepare,fix,xar"/>
     <target name="rebuild" depends="clean,all"/>
     <target name="clean">
-        <delete dir="${build}"/>
+        <delete dir="${build.dir}"/>
     </target>
     <target name="xar">
-        <mkdir dir="${build.dir}"/>
-        <zip basedir="." destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+        <zip basedir="${app.build.dir}" destfile="${build.dir}/${project.app}-${project.version}.xar" />
     </target>
+
+    <target name="prepare">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${app.build.dir}" />
+        <copy todir="${app.build.dir}">
+            <fileset dir="${basedir}">
+                <exclude name=".existdb.json" />
+                <exclude name=".git/**" />
+                <exclude name=".github/**" />
+                <exclude name=".vs/**" />
+                <exclude name=".vscode/**" />
+                <exclude name="${build.dir}/**" />
+            </fileset>
+        </copy>
+
+    </target>
+    
+
+    <target name="fix">
+        <fixcrlf srcdir="${app.build.dir}" includes="**/*.xq*" eol="lf" />
+    </target>
+
 </project>
